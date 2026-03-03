@@ -38,15 +38,15 @@ history rewriting tools](contrib/filter-repo-demos).
 
 filter-repo requires:
 
-  * git >= 2.22.0 at a minimum; [some features](#upstream-improvements)
-    require git >= 2.24.0 or later
+  * git >= 2.36.0
   * python3 >= 3.6
 
 # How do I install it?
 
-`git-filter-repo` is a single-file python script, which was done to make
-installation for basic use on many systems trivial: just place that
-file into your $PATH.
+While the `git-filter-repo` repository has many files, the main logic
+is all contained in a single-file python script named
+`git-filter-repo`, which was done to make installation for basic use
+on many systems trivial: just place that one file into your $PATH.
 
 See [INSTALL.md](INSTALL.md) for things beyond basic usage or special
 cases.  The more involved instructions are only needed if one of the
@@ -82,6 +82,9 @@ If you prefer learning from examples:
     be of interest
   * the user manual has an extensive [examples
 section](https://htmlpreview.github.io/?https://github.com/newren/git-filter-repo/blob/docs/html/git-filter-repo.html#EXAMPLES)
+  * I have collected a set of [example filterings based on user-filed issues](Documentation/examples-from-user-filed-issues.md)
+
+In either case, you may also find the [Frequently Answered Questions](Documentation/FAQ.md) useful.
 
 # Why filter-repo instead of other alternatives?
 
@@ -440,6 +443,13 @@ has also driven numerous improvements to fast-export and fast-import
 (and occasionally other commands) in core git, based on things
 filter-repo needs to do its work:
 
+  * git-2.48.0
+    * [fast-import: disallow more path components](
+      https://git.kernel.org/pub/scm/git/git.git/commit/?id=da91a90c2f)
+    * [fast-import: disallow "." and ".." path components](
+      https://git.kernel.org/pub/scm/git/git.git/commit/?id=4a2790a257)
+    * [fast-import: avoid making replace refs point to themselves](
+      https://git.kernel.org/pub/scm/git/git.git/commit/?id=5e904f1a4a)
   * git-2.28.0
     * [fast-import: add new --date-format=raw-permissive format](
       https://git.kernel.org/pub/scm/git/git.git/commit/?id=d42a2fb72f)

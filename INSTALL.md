@@ -5,6 +5,8 @@
   * [Installation via Package Manager](#installation-via-package-manager)
   * [Detailed installation explanation for
      packagers](#detailed-installation-explanation-for-packagers)
+  * [Installation as Python Package from
+     PyPI](#installation-as-python-package-from-pypi)
   * [Installation via Makefile](#installation-via-makefile)
   * [Notes for Windows Users](#notes-for-windows-users)
 
@@ -31,14 +33,13 @@ If you place the git-filter-repo script in your $PATH, then you can
 shorten commands by replacing `python3 git-filter-repo` with `git
 filter-repo`; the manual assumes this but you can use the longer form.
 
-If for some reason downloading a single file is too much of an
-installation hassle for you, or you really want some kind of "official
-installation", the other sections may have useful tips.
-
 Optionally, if you also want to use some of the contrib scripts, then
 you need to make sure you have a `git_filter_repo.py` file which is
 either a link to or copy of `git-filter-repo`, and you need to place
 that git_filter_repo.py file in $PYTHONPATH.
+
+If you prefer an "official" installation over the manual installation
+explained above, the other sections may have useful tips.
 
 # Installation via Package Manager
 
@@ -133,10 +134,21 @@ So, installation might look something like the following:
 
 or you can use the provided Makefile, as noted below.
 
+# Installation as Python Package from PyPI
+
+`git-filter-repo` is also available as
+[PyPI-package](https://pypi.org/project/git-filter-repo/).
+
+Therefore, it can be installed with [pipx](https://pypa.github.io/pipx/)
+or [uv tool](https://docs.astral.sh/uv/concepts/tools/).
+Command example for pipx:
+
+`pipx install git-filter-repo`
+
 # Installation via Makefile
 
 Installing should be doable by hand, but a Makefile is provided for those
-that prefer it.  However, usage of the Makefile really requires overridding
+that prefer it.  However, usage of the Makefile really requires overriding
 at least a couple of the directories with sane values, e.g.
 
     $ make prefix=/usr pythondir=/usr/lib64/python3.8/site-packages install
@@ -147,7 +159,11 @@ you'll still need to do that yourself.
 
 # Notes for Windows Users
 
-Windows likes to make things difficult.  Common and historical issues:
+git-filter-repo can be installed with multiple tools, such as
+[pipx](https://pypa.github.io/pipx/) or a Windows-specific package manager
+like Scoop (both of which were covered above).
+
+Sadly, Windows sometimes makes things difficult.  Common and historical issues:
 
   * **Non-functional Python stub**: Windows apparently ships with a
     [non-functional
@@ -160,11 +176,11 @@ Windows likes to make things difficult.  Common and historical issues:
     [Python](https://docs.microsoft.com/en-us/windows/python/beginners)
     from the [Microsoft
     Store](https://apps.microsoft.com/store/search?publisher=Python%20Software%20Foundation)
-  * **Modifying PATH, making the script executable**: For some reason lots of
-    Windows users have a hard time modifying their PATH and/or making scripts
-    executable.  You can skip that step by just using
-    `python3 git-filter-repo` instead of `git filter-repo` in your commands.
-  * **Different python executable name**:  It seems some users don't have
+  * **Modifying PATH, making the script executable**: If modifying your PATH
+    and/or making scripts executable is difficult for you, you can skip that
+    step by just using `python3 git-filter-repo` instead of `git filter-repo`
+    in your commands.
+  * **Different python executable name**:  Some users don't have
     a `python3` executable but one named something else like `python`
     or `python3.8` or whatever.  You may need to edit the first line
     of the git-filter-repo script to specify the appropriate path.  Or
