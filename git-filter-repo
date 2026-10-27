@@ -234,7 +234,7 @@ class AncestryGraph(object):
     # added to the AncestryGraph
     self.cur_value = 0
 
-    # A mapping from the external identifers given to us to the simple integers
+    # A mapping from the external identifiers given to us to the simple integers
     # we use in self.graph
     self.value = {}
 
@@ -745,6 +745,7 @@ class Commit(_GitElementWithId):
                parents,
                original_id = None,
                encoding = None, # encoding for message; None implies UTF-8
+               signatures = None,
                **kwargs):
     _GitElementWithId.__init__(self)
     self.old_id = self.id
@@ -775,6 +776,9 @@ class Commit(_GitElementWithId):
 
     # Record date the commit was made
     self.committer_date  = committer_date
+
+    # Record commit signatures
+    self.signatures  = signatures
 
     # Record commit message and its encoding
     self.encoding = encoding
@@ -809,6 +813,8 @@ class Commit(_GitElementWithId):
                   self.author_name, self.author_email, self.author_date,
                   self.committer_name, self.committer_email, self.committer_date
                ))
+    for algo, fmt, sig in self.signatures or []:
+      file_.write(b'gpgsig %s %s\ndata %d\n%s' % (algo, fmt, len(sig), sig))
     if self.encoding:
       file_.write(b'encoding %s\n' % self.encoding)
     file_.write(b'data %d\n%s%s' %
@@ -1055,6 +1061,7 @@ class FastExportParser(object):
     self._user_regexes = {}
     for user in (b'author', b'committer', b'tagger'):
       self._user_regexes[user] = re.compile(user + b' (.*?) <(.*?)> (.*)\n$')
+    self._gpgsig_re = re.compile(br'gpgsig (\S+) (\S+)\n$')
 
   def _advance_currentline(self):
     """
@@ -1158,6 +1165,12 @@ class FastExportParser(object):
     encoding = self._currentline[len(b'encoding '):].rstrip()
     self._advance_currentline()
     return encoding
+
+  def _parse_signature(self):
+    algo, fmt = self._gpgsig_re.match(self._currentline).groups()
+    self._advance_currentline()
+    sig = self._parse_data()
+    return (algo, fmt, sig)
 
   def _parse_ref_line(self, refname):
     """
@@ -1311,6 +1324,10 @@ class FastExportParser(object):
       (author_name, author_email, author_date) = \
         (committer_name, committer_email, committer_date)
 
+    signatures = []
+    while self._currentline.startswith(b'gpgsig '):
+      signatures.append(self._parse_signature())
+
     encoding = None
     if self._currentline.startswith(b'encoding '):
       encoding = self._parse_encoding()
@@ -1356,7 +1373,8 @@ class FastExportParser(object):
     commit = Commit(branch,
                     author_name,    author_email,    author_date,
                     committer_name, committer_email, committer_date,
-                    commit_msg, file_changes, parents, original_id, encoding)
+                    commit_msg, file_changes, parents, original_id,
+                    encoding, signatures)
 
     # If fast-export text had a mark for this commit, need to make sure this
     # mark translates to the commit's true id.
@@ -1455,7 +1473,7 @@ class FastExportParser(object):
     # Create the progress message
     progress = Progress(message)
 
-    # Call any user callback to allow them to modify the progress messsage
+    # Call any user callback to allow them to modify the progress message
     if self._progress_callback:
       self._progress_callback(progress)
 
@@ -2302,7 +2320,7 @@ EXAMPLES
         # to avoid passing --reencode=yes to fast-export (that option was the
         # default prior to git-2.23)
         args.preserve_commit_encoding = None
-      # If we don't have fast-exoprt --reencode, we may also be missing
+      # If we don't have fast-export --reencode, we may also be missing
       # diff-tree --combined-all-paths, which is even more important...
       p = subproc.Popen('git diff-tree -h'.split(),
                         stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -3186,7 +3204,7 @@ class RepoFilter(object):
     self._commit_renames = {}
 
     # A set of original_ids (i.e. original hashes) for which we have not yet
-    # gotten the new hashses; the value is always the corresponding fast-export
+    # gotten the new hashes; the value is always the corresponding fast-export
     # id (i.e. commit.id)
     self._pending_renames = collections.OrderedDict()
 

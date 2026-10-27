@@ -380,6 +380,73 @@ test_expect_success 'commit hash unchanged if requested' '
 	)
 '
 
+test_expect_success 'prepare signature tests' '
+	cat >sig_input <<-\EOF
+	feature done
+	commit refs/heads/develop
+	mark :1
+	author Just Me <just@here.org> 1234567890 -0200
+	committer Just Me <just@here.org> 1234567890 -0200
+	data 2
+	A
+
+	commit refs/heads/develop
+	mark :2
+	author Just Me <just@here.org> 1234567890 -0200
+	committer Just Me <just@here.org> 1234567890 -0200
+	gpgsig sha1 openpgp
+	data 21
+	sha1 signature stuff
+	data 2
+	B
+
+	commit refs/heads/develop
+	mark :3
+	author Just Me <just@here.org> 1234567890 -0200
+	committer Just Me <just@here.org> 1234567890 -0200
+	gpgsig sha1 openpgp
+	data 21
+	sha1 signature stuff
+	gpgsig sha256 openpgp
+	data 23
+	sha256 signature stuff
+	data 2
+	C
+	done
+	EOF
+'
+
+test_expect_success 'commit signatures ignored' '
+	(
+		git init commit_signatures &&
+		cd commit_signatures &&
+
+		git fast-import --quiet <../sig_input &&
+
+		git filter-repo --force &&
+		test $(git rev-list --count develop) = 3 &&
+		printf "%s\n" develop develop~ develop~2 | git cat-file --batch >commits &&
+		! grep "^gpgsig" commits
+	)
+'
+
+test_expect_success 'commit signatures roundtrip via --stdin' '
+	(
+		git init commit_signatures_roundtrip &&
+		cd commit_signatures_roundtrip &&
+
+		git filter-repo --stdin --dry-run --force <../sig_input &&
+
+		test_path_is_file .git/filter-repo/fast-export.filtered &&
+		grep "^gpgsig sha1 openpgp$" .git/filter-repo/fast-export.filtered >out &&
+		test_line_count = 2 out &&
+		grep "^gpgsig sha256 openpgp$" .git/filter-repo/fast-export.filtered >out &&
+		test_line_count = 1 out &&
+		grep "sha1 signature stuff" .git/filter-repo/fast-export.filtered &&
+		grep "sha256 signature stuff" .git/filter-repo/fast-export.filtered
+	)
+'
+
 test_expect_success 'commit message encoding preserved if requested' '
 	(
 		git init commit_message_encoding &&

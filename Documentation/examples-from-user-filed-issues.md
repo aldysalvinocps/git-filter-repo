@@ -10,7 +10,7 @@ questions, which may be of interest to others.
 
   * [Adding files to root commits](#adding-files-to-root-commits)
   * [Purge a large list of files](#purge-a-large-list-of-files)
-  * [Extracting a libary from a repo](#Extracting-a-libary-from-a-repo)
+  * [Extracting a library from a repo](#Extracting-a-library-from-a-repo)
   * [Replace words in all commit messages](#Replace-words-in-all-commit-messages)
   * [Only keep files from two branches](#Only-keep-files-from-two-branches)
   * [Renormalize end-of-line characters and add a .gitattributes](#Renormalize-end-of-line-characters-and-add-a-gitattributes)
@@ -65,7 +65,7 @@ e.g. `../DELETED_FILENAMES.txt`, and then run
 git filter-repo --invert-paths --paths-from-file ../DELETED_FILENAMES.txt
 ```
 
-## Extracting a libary from a repo
+## Extracting a library from a repo
 
 <!-- https://github.com/newren/git-filter-repo/issues/80 -->
 
@@ -420,7 +420,7 @@ we are turning it into a new root commit.)
 <!-- https://github.com/newren/git-filter-repo/issues/492 -->
 
 Let's say you committed thousands of pngs that were poorly compressed,
-but later aggressively recompressed the pngs and commited and pushed.
+but later aggressively recompressed the pngs and committed and pushed.
 Unfortunately, clones are slow because they still contain the poorly
 compressed pngs and you'd like to rewrite history to pretend that the
 aggressively compressed versions were used when the files were first
@@ -454,7 +454,7 @@ git filter-repo --file-info-callback '
 <!-- https://github.com/newren/git-filter-repo/issues/537 -->
 
 Let's say you have a repo with a submodule at src/my-submodule, and
-that you feel the wrong commit-hashes of the submodule were commited
+that you feel the wrong commit-hashes of the submodule were committed
 within your project and you want them updated according to the
 following table:
 ```
